@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html ng-app="listaTelefonica">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Telefonica</title>
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap-5.0.1-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="lib/fontawesome-free-5.15.3-web/css/all.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-controller="listaTelefonicaController">
+    <div class="jumbotron">
+        <h4>{{app}}</h4>
+
+        <div class="input-group mt-3">
+            <input type="text" class="form-control" ng-model="contato.busca" placeholder="Filtro" ng-required="true">
+        </div>
+
+        <table class="table table-striped mt-3" ng-show="contatos.length > 0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Operadora</th>
+                    <th>Edit</th>
+                </tr>
+            <thead>
+            <tbody>
+                <tr ng-repeat="contato in contatos | filter: contato.busca | orderBy: 'nome'">
+                    <td><input class="form-check-input" type="checkbox" value="" ng-model="contato.selecionado"></td>
+                    <td>{{contato.nome}}</td>
+                    <td>{{contato.telefone}}</td>
+                    <td>{{contato.operadora.nome}}</td>
+                    <td><button class="btn btn-warning btn-sm" ng-click="editarContato(contato)"><i class="fa fa-user-edit"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <hr/>
+        <form name="contatoForm">
+            <div class="input-group">
+                <input type="text" class="form-control" ng-model="contato.nome" placeholder="Nome" ng-required="true">
+            </div>
+    
+            <div class="input-group mt-2">
+                <input type="text" class="form-control" ng-model="contato.telefone" placeholder="Telefone" ng-required="true">
+            </div>
+    
+            <div class="input-group mt-2">
+                <select class="form-select" ng-model="contato.operadora" ng-options="operadora.nome for operadora in operadoras" ng-required="true">
+                    <option value="">Selecione uma operadora</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-primary form-control mt-2" ng-click="adicionarContato(contato)" ng-disabled="contatoForm.$invalid">Adicionar contato</button>
+            <button type="button" class="btn btn-danger form-control mt-2" ng-click="removerContatos(contatos)" ng-if="isRemoveDisabled(contatos)">Remover contato</button>
+        </form>
+    </div>  
+    <script>
+        let myApp = angular.module('listaTelefonica', []);
+
+        myApp.controller("listaTelefonicaController", ($scope) => {
+            $scope.app = "Lista Telefonica";  
+            $scope.contatos = [];
+            $scope.operadoras = [
+                {
+                    nome: "Tim", 
+                },
+                {
+                    nome: "Claro", 
+                },
+                {
+                    nome: "Vivo", 
+                }
+            ];
+
+            $scope.adicionarContato = (contato) => {
+                $scope.contatos.push(contato);
+                delete $scope.contato;
+            };
+
+            $scope.editarContato = (contato) => {
+                $scope.contato = contato;
+            };
+
+            $scope.removerContatos = (contatos) => {
+                $scope.contatos = contatos.filter(c => !c.selecionado);
+            };
+
+            $scope.isRemoveDisabled = (contatos) => {
+                return contatos.some((contato) => {
+                    return contato.selecionado
+                });
+            };
+        });
+    </script>
+</body>
+</html>
